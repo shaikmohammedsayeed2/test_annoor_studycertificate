@@ -7,7 +7,7 @@
     <form #userName="ngForm" (ngSubmit)="onClickSubmit(userName.value)">
       <div>C&A</div> 
       <label class="switch" for="isCASeen">
-        <input type="checkbox"  [(ngModel)]="test" name="isCASeen" id="isCASeen" (change)="checkClicked(test)">
+        <input type="checkbox"  [(ngModel)]="test" name="isCASeen" id="isCASeen">
         <span class="slider round"></span>
       </label>
       <div class="row">
@@ -54,19 +54,18 @@
     <div class="col">
       <div class="mb-3">
         <label for="DOB" class="form-label">DOB</label>
-        <input type="text" class="form-control" name="DOB" placeholder="DOB" id="DOB" ngModel>
-      </div>
-    </div>
-    <div class="col" *ngIf="test">
-      <div class="mb-3">
-        <label for="cid" class="form-label">Child ID</label>
-        <input type="text" class="form-control" name="cid" placeholder="Child Id" id="cid" ngModel>
+        <input type="text" class="form-control" name="DOB" placeholder="DD/MM/YYYY" id="DOB" [attr.aria-invalid]="!!formError" [attr.aria-describedby]="formError ? 'dobError' : null" ngModel>
+        <p *ngIf="formError" id="dobError" class="text-danger mt-2" role="alert">{{formError}}</p>
       </div>
     </div>
     <div class="col" *ngIf="test">
       <div class="mb-3">
         <label for="aadhaar" class="form-label">Aadhaar Number</label>
         <input type="number" class="form-control" name="aadhaar" placeholder="Aadhaar Number" id="aadhaar" ngModel>
+      </div>
+      <div class="mb-3">
+        <label for="penId" class="form-label">PEN ID</label>
+        <input type="text" class="form-control" name="penId" placeholder="PEN ID" id="penId" ngModel>
       </div>
     </div>
   </div>
@@ -78,21 +77,23 @@
 
 
 
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8" id="invoice" #invoice>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-4" #preview tabindex="-1" role="region" aria-label="Certificate preview">
+  <div class="container text-center">
+    <h2>Certificate Preview</h2>
+    <p *ngIf="hasSubmitted" role="status">Certificate updated. Review it below, then download the PDF.</p>
+    <button type="button" class="btn btn-primary" (click)="generatePDF()" [disabled]="!hasSubmitted || isGenerating">
+      {{isGenerating ? 'Generating PDF…' : 'Generate Study Certificate'}}
+    </button>
+    <p *ngIf="pdfError" class="text-danger mt-2" role="alert">{{pdfError}}</p>
+  </div>
   <div class="container mt-5">
     <div class="row">
       <div class="col-md-2"></div>
-      <div class="col-md-8">
+      <div class="col-md-8" id="invoice" #invoice>
         <div class="text-center border border-dark rounded border-3 ">
           <h1 class="font-4 text-uppercase fw-bold  font-cam">Annoor Foundation School</h1>
           <h5><u class="font-2 text-uppercase font-cam fw-bold"> STUDY & CONDUCT CERTIFICATE</u></h5>
           <h5 class="font-2 fw-bold font-cam">RAYACHOTY - 516269. A.P</h5>
-        </div>
-        <div class="d-flex justify-content-between" *ngIf="test">
-          <div class="pt-2" style="margin-top: 50px;">
-            <h6 class="font-1 ">C.ID {{childId}}</h6>
-          </div>
-          
         </div>
         <div class="d-flex justify-content-between">
           <div class="pt-2" style="margin-top: 50px;">
@@ -105,7 +106,7 @@
         <div style="margin-top: 3rem;">
           <h6 class="text-justify pt-5 font-2 font-cam" style="line-height: 3rem;">
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This
-            is to certify that {{StudentName|uppercase}} Son/Daughter of {{FatherName|uppercase}} Studied / Studying {{Class}} during the years {{Duration}}, during that
+            is to certify that {{StudentName|uppercase}} Son/Daughter of {{FatherName|uppercase}} Studied / Studying {{Class}} grade during the academic year {{Duration}}, during this
             period his/ her conduct is EXCELLENT / GOOD / SATISFACTORY.
           </h6>
         </div>
@@ -115,6 +116,7 @@
         </div>
         <div *ngIf="test">
           <h5 class="font-2 font-cam">Aadhaar No. {{aadhaar}}</h5>
+          <h5 class="font-2 font-cam">PEN ID {{penId}}</h5>
         </div>
         <div style="margin-top: 14rem">
           <div class="d-flex justify-content-between">
@@ -135,9 +137,3 @@
   </div>
 </div>
 
-<div class="container">
-  <div class="row">
-    <div class="d-flex justify-content-center"><button class="btn btn-primary"(click)="generatePDF()">Generate Study Certificate</button>
-    </div>
-  </div>
-</div>

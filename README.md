@@ -1,6 +1,10 @@
 # Test
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.6.
+This project uses Angular and Angular CLI 22.2.3, Node.js 24.22.0 LTS, and npm 12.2.0.
+
+## Setup
+
+Run `nvm install` and `nvm use` to select the Node.js version in `.nvmrc`, then run `npm install --global npm@12.2.0` and `npm ci`.
 
 ## Development server
 

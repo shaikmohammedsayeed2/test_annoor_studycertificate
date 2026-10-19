@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, provideZoneChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,7 +23,7 @@ import { environment } from '../environments/environment';
       registrationStrategy: 'registerWhenStable:30000'
     }),
   ],
-  providers: [FormsModule],
+  providers: [FormsModule, provideZoneChangeDetection()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
