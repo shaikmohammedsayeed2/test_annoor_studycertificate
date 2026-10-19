@@ -68,13 +68,10 @@ export class AppComponent {
   this.Duration = result.Duration
   this.StudentName = result.StudentName;
   this.FatherName = result.FatherName
-  this.date=this.datePipe.transform(new Date(), 'dd-MM-yyyy');
+  this.date = result.DateofIssue || this.datePipe.transform(new Date(), 'dd-MM-yyyy');
   this.Date_Birth=result.DOB;
   this.AdmissionNumber = result.Admission;
   this.Date_Numbers =  this.number_string(this.Date_Birth)
-  if(result.DateofIssue!=''){
-    this.date = result.DateofIssue
-  }
   this.penId = result.penId || ''
   this.aadhaar = result.aadhaar || ''
   this.hasSubmitted = true;
