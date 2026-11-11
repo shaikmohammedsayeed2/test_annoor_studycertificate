@@ -10,6 +10,15 @@
         <input type="checkbox"  [(ngModel)]="test" name="isCASeen" id="isCASeen">
         <span class="slider round"></span>
       </label>
+      <div id="casteToggleLabel">Include caste (optional)</div>
+      <label class="switch" for="showCaste">
+        <input type="checkbox" [(ngModel)]="showCaste" name="showCaste" id="showCaste" role="switch" aria-labelledby="casteToggleLabel">
+        <span class="slider round"></span>
+      </label>
+      <div class="mb-3" *ngIf="showCaste">
+        <label for="caste" class="form-label">Caste</label>
+        <input type="text" class="form-control" name="caste" id="caste" placeholder="BC-E" [ngModel]="caste">
+      </div>
       <div class="row">
         <div class="col">
           <div class="mb-3">
@@ -114,6 +123,7 @@
           <h5 class="font-2 font-cam">Date of birth as per record : {{Date_Birth}}</h5>
           <h5 class="font-2 font-cam">({{Date_Numbers|uppercase}}.)</h5>
         </div>
+        <h5 *ngIf="showCaste && caste" class="font-2 font-cam">Caste : {{caste}}</h5>
         <div *ngIf="test">
           <h5 class="font-2 font-cam">Aadhaar No. {{aadhaar}}</h5>
           <h5 class="font-2 font-cam">PEN ID {{penId}}</h5>

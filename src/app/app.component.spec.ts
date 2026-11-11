@@ -2,6 +2,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
+import jsPDF from 'jspdf';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -64,6 +65,64 @@ describe('AppComponent', () => {
       expect(app.hasSubmitted).toBeFalse();
       expect(app.StudentName).toBe('Shaik Mohammed Sayeed');
     }
+  });
+
+  it('should include an editable caste only when enabled and nonempty', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    tick();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const certificate = compiled.querySelector('#invoice') as HTMLElement;
+    const toggle = compiled.querySelector('#showCaste') as HTMLInputElement;
+    spyOn(compiled.querySelector('[aria-label="Certificate preview"]') as HTMLElement, 'scrollIntoView');
+    expect(compiled.querySelector('#caste')).toBeNull();
+    expect(certificate.textContent).not.toContain('Caste :');
+
+    toggle.click();
+    fixture.detectChanges();
+    tick();
+    const input = compiled.querySelector('#caste') as HTMLInputElement;
+    expect(input.value).toBe('BC-E');
+    fixture.detectChanges();
+    expect(certificate.textContent).toContain('Caste : BC-E');
+
+    for (const value of ['BC-A', '']) {
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+      const dob = compiled.querySelector('#DOB') as HTMLInputElement;
+      dob.value = '21/10/2011';
+      dob.dispatchEvent(new Event('input'));
+      compiled.querySelector('form')!.dispatchEvent(new Event('submit'));
+      tick();
+      fixture.detectChanges();
+      expect(certificate.textContent?.includes('Caste :')).toBe(!!value);
+      if (value) expect(certificate.textContent).toContain('Caste : BC-A');
+    }
+
+    toggle.click();
+    fixture.detectChanges();
+    tick();
+    expect(compiled.querySelector('#caste')).toBeNull();
+    expect(certificate.textContent).not.toContain('Caste :');
+  }));
+
+  it('should export one Letter-sized page matching the reference', async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    fixture.componentInstance.hasSubmitted = true;
+    const save = jasmine.createSpy('save');
+    jsPDF.API['save'] = save;
+    try {
+      await fixture.componentInstance.generatePDF();
+    } finally {
+      delete jsPDF.API['save'];
+    }
+    expect(fixture.componentInstance.pdfError).toBe('');
+    expect(save).toHaveBeenCalledTimes(1);
+    const pdf = save.calls.mostRecent().object as jsPDF;
+    expect(pdf.internal.pageSize.getWidth()).toBeCloseTo(215.9, 2);
+    expect(pdf.internal.pageSize.getHeight()).toBeCloseTo(279.4, 2);
+    expect(pdf.getNumberOfPages()).toBe(1);
   });
 
   it('should show and hide C&A fields and certificate sections with the toggle', async () => {

@@ -16,6 +16,8 @@ import html2canvas from 'html2canvas';
 export class AppComponent {
   selectedDate=''
   test = false
+  showCaste = false
+  caste = 'BC-E'
   hasSubmitted = false
   formError = ''
   pdfError = ''
@@ -41,7 +43,7 @@ export class AppComponent {
     this.pdfError = '';
     try {
       const canvas = await html2canvas(this.invoiceElement.nativeElement, { scale: 3 });
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdf = new jsPDF('p', 'mm', 'letter');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const scale = Math.min((pageWidth - 20) / canvas.width, (pageHeight - 20) / canvas.height);
@@ -74,6 +76,7 @@ export class AppComponent {
   this.Date_Numbers =  this.number_string(this.Date_Birth)
   this.penId = result.penId || ''
   this.aadhaar = result.aadhaar || ''
+  this.caste = result.caste ?? this.caste
   this.hasSubmitted = true;
   setTimeout(() => {
     this.previewElement.nativeElement.focus({ preventScroll: true });
