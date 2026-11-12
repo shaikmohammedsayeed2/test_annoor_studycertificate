@@ -106,19 +106,30 @@ describe('AppComponent', () => {
     expect(certificate.textContent).not.toContain('Caste :');
   }));
 
-  it('should export one Letter-sized page matching the reference', async () => {
+  it('should keep the reference page and content dimensions at different preview widths', async () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     fixture.componentInstance.hasSubmitted = true;
     const save = jasmine.createSpy('save');
-    jsPDF.API['save'] = save;
+    const addImage = spyOn(jsPDF.API as unknown as jsPDF, 'addImage').and.callThrough();
+    Object.assign(jsPDF.API, { save });
     try {
-      await fixture.componentInstance.generatePDF();
+      for (const width of ['320px', '1200px']) {
+        fixture.componentInstance.invoiceElement.nativeElement.style.width = width;
+        await fixture.componentInstance.generatePDF();
+      }
     } finally {
-      delete jsPDF.API['save'];
+      Reflect.deleteProperty(jsPDF.API, 'save');
     }
     expect(fixture.componentInstance.pdfError).toBe('');
-    expect(save).toHaveBeenCalledTimes(1);
+    expect(save).toHaveBeenCalledTimes(2);
+    for (const args of addImage.calls.allArgs()) {
+      const [, , x, y, width] = args as unknown as [string, string, number, number, number];
+      expect(x).toBeCloseTo(64 * 25.4 / 72, 2);
+      expect(y).toBeCloseTo(56 * 25.4 / 72, 2);
+      expect(width).toBeCloseTo(462 * 25.4 / 72, 2);
+    }
+    expect(addImage.calls.first().args).toEqual(addImage.calls.mostRecent().args);
     const pdf = save.calls.mostRecent().object as jsPDF;
     expect(pdf.internal.pageSize.getWidth()).toBeCloseTo(215.9, 2);
     expect(pdf.internal.pageSize.getHeight()).toBeCloseTo(279.4, 2);

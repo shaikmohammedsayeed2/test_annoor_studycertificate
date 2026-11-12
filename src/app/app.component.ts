@@ -42,14 +42,23 @@ export class AppComponent {
     this.isGenerating = true;
     this.pdfError = '';
     try {
-      const canvas = await html2canvas(this.invoiceElement.nativeElement, { scale: 3 });
+      const canvas = await html2canvas(this.invoiceElement.nativeElement, {
+        scale: 3,
+        onclone: document => {
+          const certificate = document.getElementById('invoice')!;
+          certificate.style.width = '924px';
+          certificate.style.maxWidth = 'none';
+          certificate.style.padding = '0';
+        }
+      });
       const pdf = new jsPDF('p', 'mm', 'letter');
-      const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const scale = Math.min((pageWidth - 20) / canvas.width, (pageHeight - 20) / canvas.height);
+      // Match the reference's 462-point content width and 56-point top inset.
+      const margin = 56 * 25.4 / 72;
+      const scale = Math.min((462 * 25.4 / 72) / canvas.width, (pageHeight - 2 * margin) / canvas.height);
       const width = canvas.width * scale;
       const height = canvas.height * scale;
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (pageWidth - width) / 2, 10, width, height);
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 64 * 25.4 / 72, margin, width, height);
       pdf.save(this.StudentName + '.pdf');
     } catch {
       this.pdfError = 'Could not generate the certificate. Please try again.';

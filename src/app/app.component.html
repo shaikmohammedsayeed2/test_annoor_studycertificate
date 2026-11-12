@@ -90,10 +90,6 @@
   <div class="container text-center">
     <h2>Certificate Preview</h2>
     <p *ngIf="hasSubmitted" role="status">Certificate updated. Review it below, then download the PDF.</p>
-    <button type="button" class="btn btn-primary" (click)="generatePDF()" [disabled]="!hasSubmitted || isGenerating">
-      {{isGenerating ? 'Generating PDF…' : 'Generate Study Certificate'}}
-    </button>
-    <p *ngIf="pdfError" class="text-danger mt-2" role="alert">{{pdfError}}</p>
   </div>
   <div class="container mt-5">
     <div class="row">
@@ -144,6 +140,12 @@
       </div>
       <div class="col-md-2"></div>
     </div>
+  </div>
+  <div class="container text-center my-4">
+    <button type="button" class="btn btn-primary" (click)="generatePDF()" [disabled]="!hasSubmitted || isGenerating">
+      {{isGenerating ? 'Generating PDF…' : 'Generate Study Certificate'}}
+    </button>
+    <p *ngIf="pdfError" class="text-danger mt-2" role="alert">{{pdfError}}</p>
   </div>
 </div>
 
